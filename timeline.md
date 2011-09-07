@@ -23,6 +23,9 @@ and converting those to use a new API/macro to be anchored. This could
 have a positive impact on performance and will help make things more
 thread-safe when we get to tasks that require that.
 
+*Upgrade effort for HLLs: minor (fixes to C code)
+*Benefits for HLLs: Better GC performance
+
 ### Packfiles: Rewrite packfile loading
 
 *Extent of change: large
@@ -43,6 +46,13 @@ This is a *very* big project, but represents an extremely central portion of
 Parrot. User code is going to be forced to pick up the slack from all the
 magic we're going to be removing from key systems. This is going to require
 changes to Winxed and NQP to keep code working.
+
+*Upgrade effort for HLLs: Need to change code generation to avoid using removed
+    flags. Need to generate code to explicitly add Subs to NameSpaces or to
+    MultiSubs if desired.
+*Benefits for HLLs: Improved packfile loading performance. Improved NameSpace
+    PMC performance. Decreased binary code size overall. Better control over
+    how Sub PMCs are used and stored in the system.
 
 ### PCC: Redo PIR ops for call conventions
 
@@ -68,11 +78,21 @@ lead to some significant improvements there. User code that uses PIR syntax
 for sub/method calls and .param syntax for parameters should be safe. Lots of
 tests written in PASM are going to die.
 
+*Upgrade effort for HLLs: None (changes are internal to IMCC only)
+*Benefits for HLLs: Improved invoke performance for all PIR->PIR calls.
+    Improved performance for generating backtraces. Easier to build tools like
+    debuggers and static analyzers. Improved PBC disassembly potential. Ability
+    to fetch parameters lazily.
+
 ### Packfiles: Debugging
 
 *Extent of change: low
 *Effort required: moderate
 *Relative priority: moderate
+
+*Upgrade effort for HLLs: none.
+*Benefits for HLLs: New tools for debugging and analysis, and the possibility
+    to make more new custom tools.
 
 ### Interp: Sandboxing
 
@@ -83,6 +103,11 @@ tests written in PASM are going to die.
 I've got a few ideas about how to implement basic sandboxing that need to be
 blogged about more, designed, and prototyped.
 
+*Upgrade effort for HLLs: minor (PIR code and above will be unchanged. Some
+    C-level APIs will change. New sandboxing/security standards will need to
+    be followed internally.)
+*Benefits for HLLs: Addition of basic sandboxing and security features. 
+
 ### OO: 6model
 
 *Extent of change: large
@@ -92,6 +117,16 @@ blogged about more, designed, and prototyped.
 Need to merge 6model ideas into the Parrot object model at the ground up. Need
 to completely redo some fundamental parts of the system, such as PMCs, type
 bootstrapping at startup, vtables, etc. 
+
+*Upgrade effort for HLLs: Unknown/variable. The first attempt will try to be
+    compatible at C and PIR levels with the 6model version being used in NQP.
+    NQP will need to be changed to use the version built-in to Parrot instead
+    of building and linking its own. Languages running on NQP should be
+    mostly unaffected.
+*Benefits for HLLs: Better overall performance of objects and data operations,
+    especially as integration improves. Far better interoperability between
+    6model and Class/Object for systems that want to use both. Possibly
+    improved libparrot startup time.
 
 ### Exceptions: Cleanup and Optimizations
 
@@ -110,11 +145,19 @@ remove the scheduler from the lookup for handlers. We need a lot of stuff,
 and need to keep a close eye on performance, especially if exceptions are
 going to continue to be used for normal control flow.
 
+*Upgrade effort for HLLs: none (first wave of changes are internal only)
+*Benefits for HLLs: Better performance for exceptions and handlers. Possibly
+    better able to use custom subclasses for both.
+
 ### Interp: Make Thread-Safe
 
 *Extent of change: moderate
 *Effort required: low
 *Relative priority: high
+
+*Upgrade effort for HLLs: Minor (some C code which pokes into Interp* directly
+    will need to be changed. PIR code should be unaffected)
+*Benefits for HLLs: Nothing immediate
 
 ### Threads: Rip Out and Replace
 
@@ -122,16 +165,24 @@ going to continue to be used for normal control flow.
 *Effort required: moderate
 *Relative priority: moderate
 
+*Upgrade effort for HLLs: None (unless you are using threads, or are relying
+    on vestigial C-level details of the threading system)
+*Benefits for HLLs: Modest performance improvements. Improved security
+    and separation between interps at the C level.
+
 ### IO: Proper Asynchronous IO
 
 *Extent of change: low
 *Effort required: moderate
 *Relative priority: low
 
+*Upgrade effort for HLLs: None (but can add AIO features as desired)
+*Benefits for HLLs: new IO features
+
 ### MMD: Napalm Death
 
 *Extent of change: large
-*Effort required: Moderate
+*Effort required: moderate
 *Relative priority: low
 
 We need to stop referring to Class objects by string name. Not all of them can
@@ -150,6 +201,33 @@ manhattan sort. We would probably like to do some kind of call-site caching,
 although that may want to wait until JIT.
 
 In short, the system needs to be redone from the ground up.
+
+*Upgrade effort for HLLs: If you are using Parrot's MMD from PIR code, you
+    will need to write code to add Subs to MultiSubs explicitly. If you are
+    using NQP or Winxed, those code generators will be updated to do the right
+    thing. If you are not using Parrot's built-in MMD, you will be unaffected
+*Benefits for HLLs: Better performance of MMD system. More feature-full
+    default MMD system. More control over how Subs are associated with
+    signatures. The ability to use Subs with more than one signature without
+    cloning.
+
+### PCC: Inside-Out Contexts
+
+Details to come.
+
+### Exceptions: Expose ExceptionHandler lookup and dispatch
+
+*Extent of change: moderate
+*Effort required: moderate
+*Relative priority: low
+
+*Upgrade effort for HLLs: Unknown. New interface may be same, old interface
+    may be kept for backwards compatibility. Additional PIR (or new ops) might
+    need to be generated for exception throw and catch. The basic common
+    case should probably be unchanged.
+*Benefits for HLLs: Improved control over exception dispatch. Improved
+    ability to subclass Exception and ExceptionHandler. Ability to use
+    features like MMD with exception dispatch. Simplified exception resume.
 
 ### Strings: None
 
