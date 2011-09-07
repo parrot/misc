@@ -12,9 +12,9 @@ long as dependencies are met.
 
 ### GC: Convert to Precise GC
 
-*Extent of change: small
-*Effort required: moderate
-*Relative priority: moderate
+* Extent of change: small
+* Effort required: moderate
+* Relative priority: moderate
 
 We need to convert our GC to be precise. We have some good ideas floating
 around for how to do that, and implementation of the code won't be hard. What
