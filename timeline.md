@@ -90,8 +90,7 @@ tests written in PASM are going to die.
     Improved performance for generating backtraces. Easier to build tools like
     debuggers and static analyzers. Improved PBC disassembly potential. Ability
     to fetch parameters lazily.
-* Upgrade effort for Rakudo:  Likely high -- Rakudo already has to 
-    implement custom binding code; I suspect this will also be affected.
+* Upgrade effort for Rakudo:  According to whiteknight, nil.
 * Benefit to Rakudo:  Improved invoke performance.  (We already do lazy 
     parameter fetching, although this might give us the ability to do more.)
 * Rakudo priority:  high if it results in performance improvements, low otherwise
