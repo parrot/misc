@@ -10,6 +10,8 @@ that, left to my own devices, I will probably approach these problems myself
 in this order. Other people are welcome to tackle things in any order, so
 long as dependencies are met.
 
+[from Pm:  I've updated the original gist with Rakudo-related notes below.]
+
 ### GC: Convert to Precise GC
 
 * Extent of change: small
@@ -25,6 +27,8 @@ thread-safe when we get to tasks that require that.
 
 * Upgrade effort for HLLs: minor (fixes to C code)
 * Benefits for HLLs: Better GC performance
+* Benefit to Rakudo: Better performance
+* Rakudo priority: high if it results in performance improvements, low otherwise
 
 ### Packfiles: Rewrite packfile loading
 
@@ -53,6 +57,9 @@ changes to Winxed and NQP to keep code working.
 * Benefits for HLLs: Improved packfile loading performance. Improved NameSpace
     PMC performance. Decreased binary code size overall. Better control over
     how Sub PMCs are used and stored in the system.
+* Benefit to Rakudo: Improved packfile loading (low importance) and loading 
+    size (low-medium importance).  The others are non-benefits to Rakudo.
+* Rakudo priority: low
 
 ### PCC: Redo PIR ops for call conventions
 
@@ -83,6 +90,11 @@ tests written in PASM are going to die.
     Improved performance for generating backtraces. Easier to build tools like
     debuggers and static analyzers. Improved PBC disassembly potential. Ability
     to fetch parameters lazily.
+* Upgrade effort for Rakudo:  Likely high -- Rakudo already has to 
+    implement custom binding code; I suspect this will also be affected.
+* Benefit to Rakudo:  Improved invoke performance.  (We already do lazy 
+    parameter fetching, although this might give us the ability to do more.)
+* Rakudo priority:  high if it results in performance improvements, low otherwise
 
 ### Packfiles: Debugging
 
@@ -93,6 +105,7 @@ tests written in PASM are going to die.
 * Upgrade effort for HLLs: none.
 * Benefits for HLLs: New tools for debugging and analysis, and the possibility
     to make more new custom tools.
+* Rakudo priority:  high if it results in performance analysis, moderate otherwise
 
 ### Interp: Sandboxing
 
@@ -107,6 +120,8 @@ blogged about more, designed, and prototyped.
     C-level APIs will change. New sandboxing/security standards will need to
     be followed internally.)
 * Benefits for HLLs: Addition of basic sandboxing and security features. 
+* Benefit to Rakudo:  Long term benefit, possibly -- short term benefit, zero.
+* Rakudo priority: zero.
 
 ### OO: 6model
 
@@ -127,6 +142,9 @@ bootstrapping at startup, vtables, etc.
     especially as integration improves. Far better interoperability between
     6model and Class/Object for systems that want to use both. Possibly
     improved libparrot startup time.
+* Benefit to Rakudo:  Rakudo would again be able to better use non-Rakudo
+    and non-NQP libraries.
+* Rakudo priority: low
 
 ### Exceptions: Cleanup and Optimizations
 
@@ -148,6 +166,7 @@ going to continue to be used for normal control flow.
 * Upgrade effort for HLLs: none (first wave of changes are internal only)
 * Benefits for HLLs: Better performance for exceptions and handlers. Possibly
     better able to use custom subclasses for both.
+* Rakudo priority: high if it results in better performance, low otherwise.
 
 ### Interp: Make Thread-Safe
 
@@ -158,6 +177,7 @@ going to continue to be used for normal control flow.
 * Upgrade effort for HLLs: Minor (some C code which pokes into Interp* directly
     will need to be changed. PIR code should be unaffected)
 * Benefits for HLLs: Nothing immediate
+* Rakudo priority: low
 
 ### Threads: Rip Out and Replace
 
@@ -169,6 +189,7 @@ going to continue to be used for normal control flow.
     on vestigial C-level details of the threading system)
 * Benefits for HLLs: Modest performance improvements. Improved security
     and separation between interps at the C level.
+* Rakudo priority: low
 
 ### IO: Proper Asynchronous IO
 
@@ -178,6 +199,7 @@ going to continue to be used for normal control flow.
 
 * Upgrade effort for HLLs: None (but can add AIO features as desired)
 * Benefits for HLLs: new IO features
+* Rakudo priority: high
 
 ### MMD: Napalm Death
 
@@ -210,6 +232,13 @@ In short, the system needs to be redone from the ground up.
     default MMD system. More control over how Subs are associated with
     signatures. The ability to use Subs with more than one signature without
     cloning.
+* Benefit to Rakudo:  Zero, as Rakudo and NQP already have their own type-based MMD.
+* Rakudo priority: zero.
+
+[Pm:  Also note that "write code to add Subs to MultiSubs explicitly" is
+definitely headed in the wrong direction -- it takes what is currently a compile-time
+operation and turns it into a runtime-startup operation, unless there's a
+compile-time mechanism to do the explicit adds.]
 
 ### PCC: Inside-Out Contexts
 
@@ -228,6 +257,8 @@ Details to come.
 * Benefits for HLLs: Improved control over exception dispatch. Improved
     ability to subclass Exception and ExceptionHandler. Ability to use
     features like MMD with exception dispatch. Simplified exception resume.
+* Benefits for Rakudo:  Same as for HLLs above.
+* Relative priority: low to medium
 
 ### Strings: None
 
