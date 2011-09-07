@@ -120,7 +120,7 @@ blogged about more, designed, and prototyped.
     be followed internally.)
 * Benefits for HLLs: Addition of basic sandboxing and security features. 
 * Benefit to Rakudo:  Long term benefit, possibly -- short term benefit, zero.
-* Rakudo priority: zero.
+* Rakudo priority: relatively low.
 
 ### OO: 6model
 
