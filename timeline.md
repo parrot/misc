@@ -145,6 +145,8 @@ bootstrapping at startup, vtables, etc.
     and non-NQP libraries.
 * Rakudo priority: low
 
+[Note from Pm and jnthn:  "better interoperability with Class/Object" is a non-starter for us.  Class/Object needs to die, it's terribly inefficient and 6model can do everything it does (only better).]
+
 ### Exceptions: Cleanup and Optimizations
 
 * Extent of change: high
