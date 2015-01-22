@@ -18,16 +18,18 @@ long as dependencies are met.
 * Effort required: moderate
 * Relative priority: moderate
 
-We need to convert our GC to be precise. We have some good ideas floating
+We should look into a precise GC. We have some good ideas floating
 around for how to do that, and implementation of the code won't be hard. What
 will be challenging is tracking down places where PMCs are used on the stack
 and converting those to use a new API/macro to be anchored. This could
-have a positive impact on performance and will help make things more
-thread-safe when we get to tasks that require that.
+have a positive impact on performance.
+The drawback: More memory needed, a mandatory prefix ptr for all allocated pointers.
+Add volatile to all local variables, no nested calls allowed returning PMC/STRING,
+or add register flushing code as in the Boehm-Weiser GC.
 
 * Upgrade effort for HLLs: minor (fixes to C code)
-* Benefits for HLLs: Better GC performance
-* Benefit to Rakudo: Better performance
+* Benefits for HLLs: Safer GC. Maybe worse, maybe better performance
+* Benefit to Rakudo: Safer GC. Maybe worse, maybe better performance
 * Rakudo priority: high if it results in performance improvements, low otherwise
 
 ### Packfiles: Rewrite packfile loading
@@ -129,8 +131,8 @@ blogged about more, designed, and prototyped.
 * Relative priority: high
 
 Need to merge 6model ideas into the Parrot object model at the ground up. Need
-to completely redo some fundamental parts of the system, such as PMCs, type
-bootstrapping at startup, vtables, etc. 
+to completely redo some fundamental parts of the OO system, such as PMCs, type
+bootstrapping at startup, vtables, etc.
 
 * Upgrade effort for HLLs: Unknown/variable. The first attempt will try to be
     compatible at C and PIR levels with the 6model version being used in NQP.
@@ -146,6 +148,8 @@ bootstrapping at startup, vtables, etc.
 * Rakudo priority: low
 
 [Note from Pm and jnthn:  "better interoperability with Class/Object" is a non-starter for us.  Class/Object needs to die, it's terribly inefficient and 6model can do everything it does (only better).]
+
+Work in branches `*/6model`
 
 ### Exceptions: Cleanup and Optimizations
 
@@ -169,7 +173,7 @@ going to continue to be used for normal control flow.
     better able to use custom subclasses for both.
 * Rakudo priority: high if it results in better performance, low otherwise.
 
-### Interp: Make Thread-Safe
+### Interp: Make Thread-Safe (Done)
 
 * Extent of change: moderate
 * Effort required: low
@@ -180,7 +184,7 @@ going to continue to be used for normal control flow.
 * Benefits for HLLs: Nothing immediate
 * Rakudo priority: low
 
-### Threads: Rip Out and Replace
+### Threads: Rip Out and Replace (Done)
 
 * Extent of change: moderate
 * Effort required: moderate
@@ -259,10 +263,25 @@ Details to come.
     ability to subclass Exception and ExceptionHandler. Ability to use
     features like MMD with exception dispatch. Simplified exception resume.
 * Benefits for Rakudo:  Same as for HLLs above.
-* Relative priority: low to medium
+* Rakudo priority: low to medium
 
 ### Strings: None
 
 ### Embedding API: None
 
 ### NCI: None
+
+Plobsingers NCI rework was great, but he ripped out some needed and
+useful nci signatures, without replacement, like t,2,3,4, now again in.
+Still missing is wchar_t.
+Additionally the dynamic libffi code is suboptimal, it does 3 calls per
+nci call, instead of just one.
+
+* Extent of change: low, one function only
+* Effort required: moderate
+* Relative priority: low
+
+* Upgrade effort for HLLs: None
+* Benefits for HLLs: Old HLLs will work again.
+* Benefits for Rakudo:  None. nqp switched to dyncall.
+* Rakudo priority: zero
